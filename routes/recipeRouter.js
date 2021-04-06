@@ -74,6 +74,20 @@ recipeRouter
     })
 
 recipeRouter
+    .route('/getRecipe/:id')
+    .get(async (request, response) => {
+        let id = request.params.id;
+        try {
+            const recipeData = await Recipe.findById(id);
+            response.json({ recipeData });
+        }
+        catch (err) {
+            console.log(err);
+            response.send('Error G02: Unable to fetch recipe data...');
+        }
+    })
+
+recipeRouter
     .route('/delete/:id')
     .delete(async (request, response) => {
 
@@ -85,7 +99,7 @@ recipeRouter
         try {
             // const deletedRecipe = await Recipe.deleteOne({ _id: ObjectID(`${request.params.id}`) });
             const deletedRecipe = await Recipe.findById(request.params.id).remove();
-            response.json({ data: deletedRecipe });
+            response.json({ deletedRecipe });
         }
         catch (err) {
             console.log(err);
