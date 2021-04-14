@@ -18,7 +18,7 @@ const port = process.env.PORT || 3200;
 const url = process.env.MONGODB_URI
     || "mongodb://localhost/RecipeDB";
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 const con = mongoose.connection;
 con.on("open", () => console.log("Mongo DB connected"));
 //

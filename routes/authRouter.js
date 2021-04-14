@@ -1,25 +1,56 @@
 import Express from 'express';
 import { User } from '../models/user.js';
+import bcrypt from 'bcrypt';
 
 const authRouter = Express.Router();
 
 authRouter
-    .route('/register')
+    .route('/signup')
     .post(async (req, res) => {
         console.log(req.body);
 
-        const user = new User({
-            email: req.body.email,
-            password: req.body.password,
-        });
+        const user = new User(req.body);
 
-        console.log({ user });
+        console.log(user);
         try {
             const savedUser = await user.save();
-            res.json({ error: null, data: savedUser });
+            console.log(savedUser);
+            res.json({ error: null, status: 'success' });
         } catch (error) {
-            res.status(400).json({ error });
+            res.json({ error, status: 'failed' });
         }
     })
+
+
+authRouter
+    .route('/login')
+    .post(async (req, res) => {
+        console.log('in login')
+        console.log(req.body);
+
+        let query = {
+            email: req.body.email
+        };
+
+        console.log({ query });
+        try {
+            const userFound = await User.find(query)
+            console.log({userFound})
+            if (userFound.length) {
+                const originalPassword = await bcrypt.compare(req.body.password, userFound[0].password);
+                console.log({originalPassword});
+                if (!originalPassword) {
+                    throw new Error('Error P01:Password is incorrect.');
+                }
+            }
+            else throw new Error('Error U01:User not found.');
+
+            res.json({ error: null, status: 'success' });
+
+        } catch (error) {
+            res.json({ error:error.message, status: 'failed' });
+        }
+    })
+
 
 export default authRouter;
